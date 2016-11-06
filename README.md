@@ -88,7 +88,30 @@ Data read per second: 360 reads * (506 + 6) bytes = ~180kb/sec
 
 ### Step 2: Abstract Design ###
 
+Let's start sketching out a top level overview of what our system will look like.  Our basic url shortening system will consist of two tiers: an application service layer and a data storage layer.  The application service layer is where our requests will be served and the data storage layer is where we will store our url key-value pairs. You'll also want to give an overview of how the hashing will work.  
 
+* Application Service Layer
+  * Shortening service
+    * Recieves a url and generates a hash value
+    * Checks if hash value exists in data store
+    * If it already exists, keep generating new hash values until an unused one is found  
+    * If it doesn't exist, store a new hash value => url mapping
+  * Redirection service
+    * Recieves a hash value and does a url lookup
+    * Returns a redirect to the long url
+
+* Data Storage Layer
+  * Acts like a big hash table 
+  * Stores new hash value => url mappings
+  * Retrieves a value given a key
+
+* Hashing
+  * Part of the application service layer
+  * Use the MD5 hashing function, which will take the url and a salt
+  * Take the hash value from the MD5 hashing function and covert it to Base62
+  * Take the first six characters of the Base62 value
+
+### Step 3: Understanding Bottlenecks ###
 
 ## Resources
 
