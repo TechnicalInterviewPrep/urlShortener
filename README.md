@@ -11,7 +11,26 @@ If you're new to system design problems or are not sure where to start, check ou
 
 ## The Solution
 
-Coming Soon!
+### Step 1: Constraints and Use Cases
+
+#### Use Cases ####
+
+The first thing that you want to do is ask the interviewer questions in order to clarify the use cases for your system.  For our Bitly clone we're going to have two main use cases.
+
+1. URL Shortening - recieve a url from the user and return a short url
+2. Redirection - recieve a request to a short url and redirect to the original url
+
+Other potential use cases that you could ask about include:
+  * Analytics
+  * Automatic link expiration
+  * Manual link removal
+  * UI vs. API
+
+#### Constraints ####
+##### Load #####
+
+
+##### Data #####
 
 ## Resources
 
