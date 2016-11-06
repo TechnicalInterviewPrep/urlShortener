@@ -82,7 +82,7 @@ Each hash value will need to be 6 characters long
 6 bytes per hash value => 36GB for all hash values  
 
 Now we can figure out how much data our system will be moving around at any given time  
-New data written per second: 40 writes * (500 + 6) bytes = ~20kb/sec  
+Data written per second: 40 writes * (500 + 6) bytes = ~20kb/sec  
 Data read per second: 360 reads * (506 + 6) bytes = ~180kb/sec  
 
 
@@ -111,7 +111,24 @@ Let's start sketching out a top level overview of what our system will look like
   * Take the hash value from the MD5 hashing function and covert it to Base62
   * Take the first six characters of the Base62 value
 
+
 ### Step 3: Understanding Bottlenecks ###
+  
+To recap:
+  * 400 req/sec
+    * 360 read req/sec => 180kb/sec
+    * 40 write req/sec => 20kb/sec
+  * 3TB for all urls
+  * 36GB for all hash values
+
+The logic in the application service layer is very light weight, so handling 400 req/sec should not be that challenging to solve.
+
+The bottlenecks are most likely going to be in the data storage layer.  The amount of data being read/written is small, but the number of reads and writes per second may cause issues.
+
+
+### Step 4: Scalable Design ###
+
+Coming Soon!
 
 ## Resources
 
