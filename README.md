@@ -20,6 +20,8 @@ The first thing that you want to do is ask the interviewer questions in order to
 1. URL Shortening - recieve a url from the user and return a short url
 2. Redirection - recieve a request to a short url and redirect to the original url
 
+We don't need to dive into the specifics of how these will work yet, but you should have a general idea of how we'll handle each use case.  For the url shortening, we'll have some type of hashing function that will take a long url and return back a short url.  We'll store the key-value pair in some sort of hash table for fast lookups during a redirect request.  
+
 Other potential use cases that you could ask about include:
   * Analytics
   * Automatic link expiration
@@ -36,8 +38,11 @@ You need to figure out how much traffic your system will be required to handle. 
   * Number of requests that are for url shortening (writes)
   * Number of requests that are for redirection (reads)
 
-*You: How many requests per month does the system need to be able to handle?*  
-*Interviewer: Assume that it's not going to be in the top 3 url shortening services, but it will be in the top 10.*
+
+At this point you can ask your interviewer directly for this information.  They may tell it to you or they may expect you to figure out a ballpark number.
+
+*Q: How many requests per month does the system need to be able to handle?*  
+*A: Assume that it's not going to be in the top 3 url shortening services, but it will be in the top 10.*
 
 We know that Twitter users generate 500 million tweets/day => 15B tweets/month  
 Let's assume that 5-10% of tweets use a shortened url  
@@ -59,7 +64,7 @@ Now that we know how much traffic our system is going to need to be able to hand
   * How much data will we need to store?
     * Size of the urls
     * Size of the hash values
-  * How much data will be passing through our system during peak loads?
+  * How much data will be passing through our system at any given time?
     * Reads
     * Writes
 
@@ -69,18 +74,21 @@ let's assume that the average length of a url is 500 characters
 1 char = 1 byte  
 500 bytes per URL => 3TB for all urls  
 
-We need 6B unique hash values   
-For our hash values, we will use Base62 (numbers, uppercase letters, and lowercase letters)  
-5 characters long => 62^5 = ~1B unique combinations  
-6 characters long => 62^6 = ~57B unique combinations   
+Since we have 6B urls, we will need 6B unique hash values   
+We will use Base62 for our hash values (numbers, uppercase letters, and lowercase letters)  
+5 character long hash values => 62^5 = ~1B unique combinations  
+6 character long hash values => 62^6 = ~57B unique combinations   
 Each hash value will need to be 6 characters long   
 6 bytes per hash value => 36GB for all hash values  
 
-New data written per second: 40 writes * (500 + 6) bytes = ~20kb/sec 
+Now we can figure out how much data our system will be moving around at any given time  
+New data written per second: 40 writes * (500 + 6) bytes = ~20kb/sec  
 Data read per second: 360 reads * (506 + 6) bytes = ~180kb/sec  
 
 
-### Step 2 - Abstract Design ###
+### Step 2: Abstract Design ###
+
+
 
 ## Resources
 
