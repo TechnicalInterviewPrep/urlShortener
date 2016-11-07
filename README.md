@@ -8,6 +8,7 @@ Design a URL shortening service like [bitly.com](http://www.bitly.com).
 
 If you're new to system design problems or are not sure where to start, check out the Resources section below.
 
+This example is taken from [Hired In Tech](https://www.hiredintech.com/classrooms/system-design/lesson/55).
 
 ## The Solution
 
@@ -20,7 +21,7 @@ The first thing that you want to do is ask the interviewer questions in order to
 1. URL Shortening - recieve a url from the user and return a short url
 2. Redirection - recieve a request to a short url and redirect to the original url
 
-We don't need to dive into the specifics of how these will work yet, but you should have a general idea of how we'll handle each use case.  For the url shortening, we'll have a hashing function that will take a url and return back a hash value. We'll store this hash value to url mapping in a data store and use the hash value as a short url. When we recieve a request to a short url, we'll lookup the long url and return a redirect. 
+We don't need to dive into the specifics of how these will work yet, but you should have a general idea of how we'll handle each use case.  For the url shortening, we'll have a hashing function that will take a url and return back a hash value. We'll store this hash value and url in a data store as a key-value pair and use the hash value as a short url. When we recieve a request to a short url, we'll query the data store for the long url and return a redirect. 
 
 Other potential use cases that you could ask about include:
   * Analytics
@@ -33,7 +34,7 @@ Other potential use cases that you could ask about include:
 The next thing that you want to do is clarify the constraints.  These are the factors that you will need to take into consideration as you design your system.  The constraints that we'll start with are load and data.
 
 ##### Load #####
-You need to figure out how much traffic your system will be required to handle.  For this example, a good breadown of monthly traffic would be:
+You need to figure out how much traffic your system will be required to handle.  For this example, a good breakdown of monthly traffic would be:
   * Total number of requests per month
   * Number of requests that are for url shortening (writes)
   * Number of requests that are for redirection (reads)
@@ -44,7 +45,7 @@ At this point you can ask your interviewer directly for this information.  They 
 *Q: How many requests per month does the system need to be able to handle?*  
 *A: Assume that it's not going to be in the top 3 url shortening services, but it will be in the top 10.*
 
-Since Twitter is one of the main drivers of short urls, a good way to come up with a rough estimate for monthly traffic is to base your numbers off of Twitter's monthly traffic. 
+Since Twitter is one of the main drivers of short url usage, a good way to come up with an estimate for your monthly traffic is to base your numbers off of Twitter's monthly traffic. 
 
 We know that Twitter users generate 500 million tweets/day => 15B tweets/month  
 Let's assume that 5-10% of tweets use a shortened url  
@@ -52,6 +53,8 @@ That would mean the total number of new urls being shortened each month is rough
 Let's assume that 80% of requests go to the top 3 link shortener sites => 1.2B  
 The remaining 20% of requests go to all of the other link shortern sites => 300M   
 If we're one of the top 10 link shortener sites, but not one of the top 3, a conservative estimate for the number of links that we shorten a month would be 100M
+
+Now that we know how many writes per month (url shortening) we'll be handling, we need to figure out how many reads per month (redirect requests) we need to design for.  Again, you can ask your interviewer for this information directly and they may tell you or they may expect you to come up with a reasonable answer yourself.
 
 *Q: Do we know the read/write ratio of our monthly traffic?*  
 *A: You can assume that 10% of requests are writes and 90% are reads.*
@@ -111,7 +114,7 @@ Let's start sketching out a top level overview of what our system will look like
 * Hashing
   * Part of the application service layer
   * We'll use the MD5 hashing function, which will take the url and a salt
-  * The hash value from the MD5 hashing function will be coverted to Base62
+  * The hash value from the MD5 hashing function will need to be coverted to Base62
   * Then we'll use the first six characters of the Base62 value
 
 
@@ -121,8 +124,8 @@ To recap:
   * 400 req/sec
     * 360 read req/sec => 180kb/sec
     * 40 write req/sec => 20kb/sec
-  * 3TB for all urls
-  * 36GB for all hash values
+  * 3TB for all urls (over 5 years)
+  * 36GB for all hash values (over 5 years)
 
 The logic in the application service layer is very light weight, so handling 400 req/sec should not be that challenging to solve.
 
