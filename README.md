@@ -4,14 +4,29 @@
 
 ## System Design Challenge
 
-Design a URL shortening service like [bitly.com](http://www.bitly.com).
+Design a url shortening service like [bitly.com](http://www.bitly.com). 
 
 If you're new to system design problems or are not sure where to start, check out the Resources section below.
 
 This example is taken from [Hired In Tech](https://www.hiredintech.com/classrooms/system-design/lesson/55).
 
-## The Solution
+## Clarifying Questions
 
+If you're working through this problem by yourself or doing a mock interview with a friend, these are the answers that the interviewer would give to the following questions:
+
+*Q: Do I need to design for any use cases besides url shortening and redirection?*  
+*A: No, the only functionality that you need to worry about is shortening urls and redirecting the user to the proper url when they input a shortened url.*
+
+*Q: How many requests per month does the system need to be able to handle?*  
+*A: Assume that it's not going to be in the top 3 url shortening services, but it will be in the top 10.*  
+OR   
+*A: The system should be able handle 1 billion requests per month.  100M requests per month are for shortening new urls and the remaining 900M requests per month are for redirection.*
+
+*Q: Do we know the read/write ratio of our monthly traffic?*  
+*A: You can assume that 10% of requests are writes and 90% are reads.*
+
+## The Solution
+  
 ### Step 1: Constraints and Use Cases
 
 #### Use Cases ####
