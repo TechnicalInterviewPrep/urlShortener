@@ -20,7 +20,7 @@ The first thing that you want to do is ask the interviewer questions in order to
 1. URL Shortening - recieve a url from the user and return a short url
 2. Redirection - recieve a request to a short url and redirect to the original url
 
-We don't need to dive into the specifics of how these will work yet, but you should have a general idea of how we'll handle each use case.  For the url shortening, we'll have some type of hashing function that will take a long url and return back a short url.  We'll store the key-value pair in some sort of hash table for fast lookups during a redirect request.  
+We don't need to dive into the specifics of how these will work yet, but you should have a general idea of how we'll handle each use case.  For the url shortening, we'll have a hashing function that will take a url and return back a hash value. We'll store this hash value to url mapping in a data store and use the hash value as a short url. When we recieve a request to a short url, we'll lookup the long url and return a redirect. 
 
 Other potential use cases that you could ask about include:
   * Analytics
@@ -43,6 +43,8 @@ At this point you can ask your interviewer directly for this information.  They 
 
 *Q: How many requests per month does the system need to be able to handle?*  
 *A: Assume that it's not going to be in the top 3 url shortening services, but it will be in the top 10.*
+
+Since Twitter is one of the main drivers of short urls, a good way to come up with a rough estimate for monthly traffic is to base your numbers off of Twitter's monthly traffic. 
 
 We know that Twitter users generate 500 million tweets/day => 15B tweets/month  
 Let's assume that 5-10% of tweets use a shortened url  
@@ -78,7 +80,8 @@ Since we have 6B urls, we will need 6B unique hash values
 We will use Base62 for our hash values (numbers, uppercase letters, and lowercase letters)  
 5 character long hash values => 62^5 = ~1B unique combinations  
 6 character long hash values => 62^6 = ~57B unique combinations   
-Each hash value will need to be 6 characters long   
+Since we need 6B unique combinations, each hash value will need to be 6 characters long   
+1 char = 1 byte  
 6 bytes per hash value => 36GB for all hash values  
 
 Now we can figure out how much data our system will be moving around at any given time  
@@ -88,7 +91,7 @@ Data read per second: 360 reads * (506 + 6) bytes = ~180kb/sec
 
 ### Step 2: Abstract Design ###
 
-Let's start sketching out a top level overview of what our system will look like.  Our basic url shortening system will consist of two tiers: an application service layer and a data storage layer.  The application service layer is where our requests will be served and the data storage layer is where we will store our url key-value pairs. You'll also want to give an overview of how the hashing will work.  
+Let's start sketching out a top level overview of what our system will look like.  Our basic url shortening system will consist of two tiers: an application service layer and a data storage layer.  The application service layer is where our requests will be served and the data storage layer is where we will store our hash value to url mappings. You'll also want to give an overview of how the hashing will work.  
 
 * Application Service Layer
   * Shortening service
@@ -107,9 +110,9 @@ Let's start sketching out a top level overview of what our system will look like
 
 * Hashing
   * Part of the application service layer
-  * Use the MD5 hashing function, which will take the url and a salt
-  * Take the hash value from the MD5 hashing function and covert it to Base62
-  * Take the first six characters of the Base62 value
+  * We'll use the MD5 hashing function, which will take the url and a salt
+  * The hash value from the MD5 hashing function will be coverted to Base62
+  * Then we'll use the first six characters of the Base62 value
 
 
 ### Step 3: Understanding Bottlenecks ###
